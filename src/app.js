@@ -3,17 +3,29 @@
 
 const fs = require('fs');
 
-const fileForCopy = process.argv[2];
-const copyTo = process.argv[3];
+const [fileForCopy, copyTo] = process.argv.slice(2);
 
-if (process.argv.length < 4) {
-  console.error('Must be two arguments');
-} else {
-  fs.readFile(fileForCopy, 'utf8', (err, data) => {
+function copyFile(source, newPath) {
+  const regularExpression = /^[/-]/;
+  const argsIsInvalid =
+    regularExpression.test(source) || regularExpression.test(newPath);
+  const argsDontExist = !source || !newPath;
+
+  if (source === newPath) {
+    return;
+  }
+
+  if (argsIsInvalid || argsDontExist) {
+    console.error('Invalid arguments');
+
+    return;
+  }
+
+  fs.readFile(source, (err, data) => {
     if (err) {
       console.error(err);
     } else {
-      fs.writeFile(copyTo, data, (error) => {
+      fs.writeFile(newPath, data, (error) => {
         if (error) {
           console.error(error);
         }
@@ -21,3 +33,5 @@ if (process.argv.length < 4) {
     }
   });
 }
+
+copyFile(fileForCopy, copyTo);
